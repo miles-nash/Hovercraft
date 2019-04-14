@@ -1,0 +1,67 @@
+#include <Servo.h>
+
+Servo liftL;
+Servo liftR;
+Servo steeringL;
+Servo steeringR;
+
+static int SPEED = 40; // speed of travel out of 180
+
+void setup() {
+  // setup each motor, (pin, min pwm, max pwm)
+  liftL.attach(5,1000,2000);
+  liftR.attach(6, 1000, 2000);
+  steeringL.attach(10, 1000,2000);
+  steeringR.attach(9, 1000, 2000);
+  calibrateESC();
+}
+
+void loop() {
+  startHover();
+  turnRight();
+  //steeringR.write(0);
+  //delay(2000);
+}
+
+void startHover() {
+  //power up the downward facing motors to hover the craft
+  liftL.write(100); //100 is least feasable hover speed
+  liftR.write(100);
+}
+
+void endHover(){
+  //Turn off downward facing motors, thus ending craft hovering
+  liftL.write(0);
+  liftR.write(0);
+}
+
+void turnRight(){
+  //Turn right
+  liftL.write(100);
+  liftR.write(0);
+}
+void forward(){
+  //moves forward at selected SPEED
+  steeringL.write(SPEED);
+  steeringR.write(SPEED);
+}
+
+
+
+
+
+
+void calibrateESC(){
+  // callibrate the escs
+  //escs can have differing min and max pwm values, we set these here
+  liftL.write(180);//set max esc value
+  liftR.write(180);
+  steeringL.write(180);
+  steeringR.write(180);
+  delay(5000);
+  liftL.write(0);//set min esc value
+  liftR.write(0);
+  steeringL.write(0);
+  steeringR.write(0);
+  delay(5000);
+}
