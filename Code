@@ -1,4 +1,11 @@
+#include <QTRSensors.h>
+
 #include <Servo.h>
+
+
+QTRSensors qtr;
+const uint8_t SensorCount = 7;
+uint16_t sensorValues[SensorCount];
 
 Servo liftL;
 Servo liftR;
@@ -13,20 +20,60 @@ void setup() {
   liftR.attach(6, 1000, 2000);
   steeringL.attach(10, 1000,2000);
   steeringR.attach(9, 1000, 2000);
+  
   calibrateESC();
+  
+  delay(1000);
+  startHover();
+  delay(1000);
+  setupQTR();
 }
 
 void loop() {
   startHover();
-  turnRight();
+/*
+  // read calibrated sensor values and obtain a measure of the line position
+  // from 0 to 5000 (for a white line, use readLineWhite() instead)
+  uint16_t position = qtr.readLineBlack(sensorValues);
+
+  // print the sensor values as numbers from 0 to 1000, where 0 means maximum
+  // reflectance and 1000 means minimum reflectance, followed by the line
+  // position
+  for (uint8_t i = 0; i < SensorCount; i++)
+  {
+    Serial.print(sensorValues[i]);
+    Serial.print('\t');
+  }
+  Serial.println(position);
+
+  int major = map(position,0,7000,SPEED/2,SPEED);
+  int minor = SPEED - major;
+
+  if(position > 3500){
+    steeringR.write(major);
+    steeringL.write(minor);
+  }else if(position <= 3500){
+    steeringR.write(minor);
+    steeringL.write(major);
+  }
+  */
+  delay(5000);
+  forward();
+  delay(5000);
+  //turnRight();
+  //delay(5000);
+  //turnLeft();
+  //delay(5000);
+  //forward();
+  //delay(5000);
   //steeringR.write(0);
-  //delay(2000);
+//  /*///delay(2000);
 }
 
 void startHover() {
   //power up the downward facing motors to hover the craft
-  liftL.write(100); //100 is least feasable hover speed
-  liftR.write(100);
+  liftL.write(150); //100 is least feasable hover speed
+  liftR.write(150);
 }
 
 void endHover(){
@@ -37,18 +84,20 @@ void endHover(){
 
 void turnRight(){
   //Turn right
-  liftL.write(100);
-  liftR.write(0);
+  steeringL.write(100);
+  steeringR.write(0);
+}
+
+void turnLeft(){
+  //Turn right
+  steeringL.write(0);
+  steeringR.write(100);
 }
 void forward(){
   //moves forward at selected SPEED
   steeringL.write(SPEED);
   steeringR.write(SPEED);
 }
-
-
-
-
 
 
 void calibrateESC(){
@@ -64,4 +113,42 @@ void calibrateESC(){
   steeringL.write(0);
   steeringR.write(0);
   delay(5000);
+}
+
+void setupQTR(){
+  qtr.setTypeRC();
+  qtr.setSensorPins((const uint8_t[]){2,3,4,14,15,12,17}, SensorCount);
+  qtr.setEmitterPin(11);
+
+  delay(500);
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, HIGH); // turn on Arduino's LED to indicate we are in calibration mode
+
+  // 2.5 ms RC read timeout (default) * 10 reads per calibrate() call
+  // = ~25 ms per calibrate() call.
+  // Call calibrate() 400 times to make calibration take about 10 seconds.
+  for (uint16_t i = 0; i < 400; i++)
+  {
+    qtr.calibrate();
+  }
+  digitalWrite(LED_BUILTIN, LOW); // turn off Arduino's LED to indicate we are through with calibration
+
+  // print the calibration minimum values measured when emitters were on
+  Serial.begin(9600);
+  for (uint8_t i = 0; i < SensorCount; i++)
+  {
+    Serial.print(qtr.calibrationOn.minimum[i]);
+    Serial.print(' ');
+  }
+  Serial.println();
+
+  // print the calibration maximum values measured when emitters were on
+  for (uint8_t i = 0; i < SensorCount; i++)
+  {
+    Serial.print(qtr.calibrationOn.maximum[i]);
+    Serial.print(' ');
+  }
+  Serial.println();
+  Serial.println();
+  delay(1000);
 }
