@@ -1,3 +1,10 @@
+/*Code Author: Miles Nash May, 2019
+ * Github: https://github.com/miles-nash/Hovercraft
+ * Line Following Hovercraft project
+ * in conjunction with the Lockheed Martin Explorer Post
+ * Teamates Cooper Kern, Dylan ... , and Oliver Testerman
+ * 
+*/
 #include <QTRSensors.h>
 
 #include <Servo.h>
@@ -30,11 +37,14 @@ void setup() {
 }
 
 void loop() {
+
+  //adjust these to calibrate the hovercraft
   startHover();
-  int tolerance = 1000;
-  int timeOn = 1000;
-  int timeOff = 1000;
+  int tolerance = 500;
+  int timeOn = 500;
+  int timeOff = 500;
   int power = 80;
+  int forwardPower = 140;
 
   
   uint16_t position = qtr.readLineBlack(sensorValues);
@@ -55,17 +65,12 @@ void loop() {
     digitalWrite(13,LOW);
   }
   else{
-    steeringL.write(power);
-    delay(timeOn/2);
+    steeringL.write(forwardPower);
+    delay(timeOn);
     steeringL.write(0);
-    steeringR.write(power);
-    delay(timeOn/2);
-    steeringR.write(0);
-    steeringL.write(power);
-    delay(timeOn/2);
-    steeringL.write(0);
-    steeringR.write(power);
-    delay(timeOn/2);
+    delay(100);
+    steeringR.write(forwardPower);
+    delay(timeOn);
     steeringR.write(0);
   }
 
@@ -94,6 +99,9 @@ void calibrateESC(){
   delay(5000);
 }
 
+
+
+//calibrates and sets up the line following sensor. Glide the sensor array across the line a few times while the LED is on
 void setupQTR(){
   qtr.setTypeRC();
   qtr.setSensorPins((const uint8_t[]){2,3,4,14,15,12,17}, SensorCount);
