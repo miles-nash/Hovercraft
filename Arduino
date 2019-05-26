@@ -6,7 +6,6 @@
  * 
 */
 #include <QTRSensors.h>
-
 #include <Servo.h>
 
 
@@ -40,11 +39,11 @@ void loop() {
 
   //adjust these to calibrate the hovercraft
   startHover();
-  int tolerance = 500;
+  int tolerance = 1000;
   int timeOn = 500;
   int timeOff = 500;
-  int power = 80;
-  int forwardPower = 140;
+  int power = 90;
+  int forwardPower = 160;
 
   
   uint16_t position = qtr.readLineBlack(sensorValues);
@@ -57,7 +56,7 @@ void loop() {
     delay(timeOff);
     digitalWrite(13,LOW);
   }else if(position < 3000 - tolerance){
-    steeringR.write(power);
+    steeringR.write(power + 50); //changed to correct for drift due to weight distribution
     delay(timeOn);
     steeringR.write(0);
     digitalWrite(13,HIGH);
@@ -72,6 +71,7 @@ void loop() {
     steeringR.write(forwardPower);
     delay(timeOn);
     steeringR.write(0);
+    delay(100);
   }
 
 
