@@ -1,9 +1,9 @@
 /*Code Author: Miles Nash May, 2019
  * Github: https://github.com/miles-nash/Hovercraft
  * Line Following Hovercraft project
- * in conjunction with the Lockheed Martin Explorer Post
- * Teamates Cooper Kern, Dylan ... , and Oliver Testerman
- * 
+ * 1st place hovercraft final for the Lockheed Martin Explorer Post
+ * Teamates Cooper Kern, Dylan Bolt, and Oliver Testerman
+ * Team: There is no sound in space
 */
 #include <QTRSensors.h>
 #include <Servo.h>
